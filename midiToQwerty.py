@@ -11,24 +11,25 @@ midi_to_piano_mapping = "1!2@34$5%6^78*9(0qQwWeErtTyYuiIoOpPasSdDfgGhHjJklLzZxcC
 
 
 
-def midiToQwerty(midi, hand):
+def cacheNotes(midi, hand):
 	cachedNotes = []
 	pressedNotes, releasedNotes = [], []
 
-	delay, oldDelay = 0, 0
+	delay, oldDelay = 0, None
 
 	for message in MidiFile(midi):
-		if ((not hasattr(message, 'note')) or (message.type not in {"note_on", "note_off"})):
+		if ((not hasattr(message, "note")) or (not (message.type in {"note_on", "note_off"}))):
 			continue
 
 		delay += message.time
 
-		mapIndex = (message.note - 36) % 61 if message.note != -1 else message.note + 12
+		mapIndex = (message.note - 36)
+		mapIndex = (mapIndex % 61) if mapIndex != -1 else mapIndex + 12
 		if ((hand != None) and (getNoteSide(mapIndex) != hand)):
 			continue
 		note = midi_to_piano_mapping[mapIndex]
 
-		if delay != oldDelay:
+		if delay != (oldDelay if oldDelay != None else delay):
 			cachedNotes.append([(delay - oldDelay), pressedNotes, releasedNotes])
 			pressedNotes, releasedNotes = [], []
 
@@ -69,7 +70,7 @@ def main():
 	if ((hand != "left") and (hand != "right")):
 		hand = None
 		
-	autoPiano.main((midiToQwerty(midiFile, hand)))
+	autoPiano.main((cacheNotes(midiFile, hand)))
 
 if __name__ == "__main__":
 	main()
