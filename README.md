@@ -5,14 +5,12 @@
 
 2. **Download Executable:**
    - Locate the latest release.
-   - Download the executable file (`.exe`) for your operating system.
+   - Download the executable file (`.exe`) for your operating system. (Windows only)
 
-3. **Run the Script:**
-   - Execute the downloaded script with your MIDI input device connected.
+3. **Run the Executable:**
+   - **Windows:**
+     - Double-click on the `.exe` file to open the Auto Piano Script.
 
-4. **Experience the Joy:**
-   - Immerse yourself in the joy of automated piano playing with versatile controls.
-
-Download now and start playing beautiful melodies effortlessly!
+Enjoy the automated piano experience with the click of a button! 🎹
 
 Feedback and contributions are welcome. Happy playing! 🎵
