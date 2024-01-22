@@ -11,47 +11,32 @@ midi_to_piano_mapping = "1!2@34$5%6^78*9(0qQwWeErtTyYuiIoOpPasSdDfgGhHjJklLzZxcC
 
 
 
-def midiToQwerty(midi, output, hand):
-	
-	lines = []
-	pressedNotes = ["+"]
-	releasedNotes = ["-"]
+def midiToQwerty(midi, hand):
+	cachedNotes = []
+	pressedNotes, releasedNotes = [], []
 
-	delay = 0
-	oldDelay = None
+	delay, oldDelay = 0, 0
 
 	for message in MidiFile(midi):
-
-		if not hasattr(message, 'note'):
-			continue
-
-		msgType = message.type
-		if (not ((msgType == "note_on") or (msgType == "note_off"))):
+		if ((not hasattr(message, 'note')) or (message.type not in {"note_on", "note_off"})):
 			continue
 
 		delay += message.time
 
-		mapIndex = (message.note - 36)
-		mapIndex = mapIndex % 61 if mapIndex != -1 else mapIndex + 12
-		if hand != None:
-			if getNoteSide(mapIndex) != hand:
-				continue
+		mapIndex = (message.note - 36) % 61 if message.note != -1 else message.note + 12
+		if ((hand != None) and (getNoteSide(mapIndex) != hand)):
+			continue
 		note = midi_to_piano_mapping[mapIndex]
 
-		if delay != (oldDelay if oldDelay != None else delay):
-			lines.append(f"{oldDelay} {"".join(pressedNotes)} {"".join(releasedNotes)}")
-			pressedNotes = ["+"]
-			releasedNotes = ["-"]
+		if delay != oldDelay:
+			cachedNotes.append([(delay - oldDelay), pressedNotes, releasedNotes])
+			pressedNotes, releasedNotes = [], []
 
-		if msgType == "note_on":
-			pressedNotes.append(note)
-		else:
-			releasedNotes.append(note)
+		(pressedNotes if message.type == "note_on" else releasedNotes).append(note)
 
 		oldDelay = delay
-	
-	with open(output, "w") as outputFile:
-		outputFile.write("\n".join(lines))
+
+	return cachedNotes
 
 def getNoteSide(index):
 
@@ -83,10 +68,8 @@ def main():
 	hand = input("Use left or right hand? (leave blank for both): \n")
 	if ((hand != "left") and (hand != "right")):
 		hand = None
-
-	midiToQwerty(midiFile, "output.txt", hand)
-
-	autoPiano.main()
+		
+	autoPiano.main((midiToQwerty(midiFile, hand)))
 
 if __name__ == "__main__":
 	main()
