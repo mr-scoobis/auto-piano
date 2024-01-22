@@ -18,27 +18,6 @@ is_playing = False
 
 
 
-def cacheQwertyNotes():
-
-	with open("output.txt", "r") as qwertyNotes:
-		lines = qwertyNotes.read().split("\n")
-		length = (len(lines) - 1)
-
-		cachedNotes = []
-		for index, line in enumerate(lines):
-			line = line.split(" ")
-			nextLine = lines[min([length, index + 1])].split(" ")
-
-			delay = (float(nextLine[0]) - float(line[0]))
-			pressedNotes = line[1][1:]
-			releasedNotes = line[2][1:]
-
-			cachedNotes.append([delay, pressedNotes, releasedNotes])
-		
-	return cachedNotes
-
-
-
 def playNextNote():
 	global current_note_index
 
@@ -46,19 +25,18 @@ def playNextNote():
 		releaseAllKeys()
 		return False
 
-	if current_note_index >= (len(cachedNotes) - 1):
+	if current_note_index >= (len(cached_notes) - 1):
 		current_note_index = 0
 		releaseAllKeys()
 		return False
 
-	delay = cachedNotes[current_note_index][0] / playback_speed
-
-	for releasedKey in cachedNotes[current_note_index][2]:
+	for releasedKey in cached_notes[current_note_index][2]:
 		releaseKey(releasedKey)
 
-	for pressedKey in cachedNotes[current_note_index][1]:
+	for pressedKey in cached_notes[current_note_index][1]:
 		pressKey(pressedKey)
-	
+
+	delay = cached_notes[current_note_index][0] / playback_speed
 	current_note_index += 1
 	Timer(delay, playNextNote).start()
 
@@ -97,7 +75,7 @@ def resetSpeed(normal):
 
 def fastForward(time):
 	global current_note_index
-	current_note_index = min([(current_note_index + time), (len(cachedNotes) - 1)])
+	current_note_index = min([(current_note_index + time), (len(cached_notes) - 1)])
 
 	print(f"Skipped to {current_note_index}")
 
@@ -111,7 +89,7 @@ def restart():
 	global current_note_index
 	current_note_index = 0
 
-	print(f"Restarted song.")
+	print(f"Restarted song...")
 
 key_bindings = {
 	"Key.end": [escape, True],
@@ -155,9 +133,9 @@ def onKeyPress(key):
 
 
 
-def main():
-	global cachedNotes, is_playing, current_note_index
-	cachedNotes = cacheQwertyNotes()
+def main(cachedNotes):
+	global cached_notes, is_playing, current_note_index
+	cached_notes = cachedNotes
 
 	printControls()
 
