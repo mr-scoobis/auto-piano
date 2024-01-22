@@ -1,7 +1,7 @@
 ### How to Use:
 
 1. **Go to the Release Tab:**
-   - Visit the [Release Tab](https://github.com/mr-scoobis/auto-piano/releases) on GitHub.
+   - Visit the [Release Tab](https://github.com/mr-scoobis/auto-piano/releases)
 
 2. **Download Executable:**
    - Locate the latest release.
